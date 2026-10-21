@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "MinGW",
+            "includePath": [
+                "C:/Users/popot/Desktop/ApiLCard/**",
+                "C:/mingw-w64/include",
+                "C:/mingw-w64/x86_64-w64-mingw32/include",
+                "C:/Program Files (x86)/L-Card/ltr/include"
+            ],
+            "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
+            "compilerPath": "C:/mingw-w64/bin/g++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}
