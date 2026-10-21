@@ -354,10 +354,17 @@ int main() {
     std::thread httpThread(runHttpServer);
     httpThread.detach();
 
-    printf("Нажмите 'q' для выхода.\n\n");
+    printf("Нажмите 'q' для выхода (или отправьте SIGTERM).\n\n");
     while (true) {
+        if (g_stopRequested.load()) break;
+        
+        // На Linux, если нет терминала (работает как служба), не слушаем клавиатуру
+        #ifdef _WIN32
         if (_kbhit() && _getch() == 'q') break;
-        if (g_stopRequested.load()) break;      
+        #else
+        if (isatty(STDIN_FILENO) && _kbhit() && _getch() == 'q') break;
+        #endif
+        
         Sleep(100);
     }
     
