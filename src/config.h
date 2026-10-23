@@ -18,7 +18,7 @@
 // ============================================================
 struct ChannelConfig {
     BOOL  enable = FALSE;
-    BYTE  range  = LTR24_RANGE_2;   // LTR24_RANGE_2 или LTR24_RANGE_10
+    BYTE  range  = LTR24_RANGE_2;
     BOOL  ac     = FALSE;
     BOOL  icp    = FALSE;
 };
@@ -32,20 +32,12 @@ struct AppConfig {
     int         slot     = 1;
 
     // [ADC]
-    int freq_hz          = 14000;
+    int freq_hz          = 29297;
     int format           = 24;
+    int block_size       = 512;
 
     // [Channel0..3]
     ChannelConfig channels[4];
-
-    // [Cycle]
-    double record_time   = 5.0;
-    double sleep_time    = 5.0;
-
-    // [Output]
-    std::string output_file   = "data.csv";
-    int         block_size    = 512;
-    bool        write_to_file = true;
 
     // Вспомогательные преобразования
     int getFreqCode()   const;
@@ -53,9 +45,7 @@ struct AppConfig {
     int getSlotCode()   const;
 };
 
-// ============================================================
 // Загрузка / сохранение / вывод
-// ============================================================
 bool LoadConfig(const std::string& path, AppConfig& cfg);
 bool SaveConfig(const std::string& path, const AppConfig& cfg);
 void PrintConfig(const AppConfig& cfg);

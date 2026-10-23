@@ -29,27 +29,24 @@ static bool parseBool(const std::string& v) {
 // Преобразования
 // ============================================================
 int AppConfig::getFreqCode() const {
-        switch (freq_hz) {
-        case 610:    return LTR24_FREQ_610;      // 610.3515625 Гц
-        case 915:    return LTR24_FREQ_915;      // 915.52734375 Гц
-        case 1220:   return LTR24_FREQ_1K2;      // 1.220703125 кГц
-        case 1831:   return LTR24_FREQ_1K8;      // 1.8310546875 кГц
-        case 2441:   return LTR24_FREQ_2K4;      // 2.44140625 кГц
-        case 3662:   return LTR24_FREQ_3K6;      // 3.662109375 кГц
-        case 4883:   return LTR24_FREQ_4K8;      // 4.8828125 кГц
-        case 7324:   return LTR24_FREQ_7K3;      // 7.32421875 кГц
-        case 9766:   return LTR24_FREQ_9K7;      // 9.765625 кГц
-        case 14648:  return LTR24_FREQ_14K;      // 14.6484375 кГц
-        case 19531:  return LTR24_FREQ_19K;      // 19.53125 кГц
-        case 29297:  return LTR24_FREQ_29K;      // 29.296875 кГц
-        case 39062:  return LTR24_FREQ_39K;      // 39.0625 кГц
-        case 58594:  return LTR24_FREQ_58K;      // 58.59375 кГц
-        case 78125:  return LTR24_FREQ_78K;      // 78.125 кГц
-        case 117188: return LTR24_FREQ_117K;     // 117.1875 кГц
-        default:
-            printf("[CFG] getFreqCode: НЕИЗВЕСТНАЯ freq_hz=%d → default 14K\n", freq_hz);
-            fflush(stdout);
-            return LTR24_FREQ_14K;
+    switch (freq_hz) {
+        case 610:    return LTR24_FREQ_610;     // Точная частота: 610.3515625 Гц
+        case 915:    return LTR24_FREQ_915;     // Точная частота: 915.52734375 Гц
+        case 1220:   return LTR24_FREQ_1K2;     // Точная частота: 1220.703125 Гц
+        case 1831:   return LTR24_FREQ_1K8;     // Точная частота: 1831.0546875 Гц
+        case 2441:   return LTR24_FREQ_2K4;     // Точная частота: 2441.40625 Гц
+        case 3662:   return LTR24_FREQ_3K6;     // Точная частота: 3662.109375 Гц
+        case 4883:   return LTR24_FREQ_4K8;     // Точная частота: 4882.8125 Гц
+        case 7324:   return LTR24_FREQ_7K3;     // Точная частота: 7324.21875 Гц
+        case 9766:   return LTR24_FREQ_9K7;     // Точная частота: 9765.625 Гц
+        case 14648:  return LTR24_FREQ_14K;     // Точная частота: 14648.4375 Гц
+        case 19531:  return LTR24_FREQ_19K;     // Точная частота: 19531.25 Гц
+        case 29297:  return LTR24_FREQ_29K;     // Точная частота: 29296.875 Гц 
+        case 39062:  return LTR24_FREQ_39K;     // Точная частота: 39062.5 Гц
+        case 58594:  return LTR24_FREQ_58K;     // Точная частота: 58593.75 Гц
+        case 78125:  return LTR24_FREQ_78K;     // Точная частота: 78125.0 Гц 
+        case 117188: return LTR24_FREQ_117K;    // Точная частота: 117187.5 Гц
+        default:     return LTR24_FREQ_29K;     
     }
 }
 
@@ -104,13 +101,6 @@ bool LoadConfig(const std::string& path, AppConfig& cfg) {
         else if (section == "adc") {
             if (key == "freq_hz") cfg.freq_hz = std::stoi(value);
             else if (key == "format") cfg.format = std::stoi(value);
-        }
-        else if (section == "cycle") {
-            if (key == "record_time") cfg.record_time = std::stod(value);
-            else if (key == "sleep_time") cfg.sleep_time = std::stod(value);
-        }
-        else if (section == "output") {
-            if (key == "file")            cfg.output_file = value;
             else if (key == "block_size") cfg.block_size = std::stoi(value);
         }
         else if (section.rfind("channel", 0) == 0) {
@@ -125,7 +115,6 @@ bool LoadConfig(const std::string& path, AppConfig& cfg) {
             else if (key == "icp")    cfg.channels[ch].icp = parseBool(value) ? TRUE : FALSE;
         }
     }
-
     return true;
 }
 
@@ -144,7 +133,8 @@ bool SaveConfig(const std::string& path, const AppConfig& cfg) {
 
     f << "[ADC]\n";
     f << "freq_hz      = " << cfg.freq_hz << "\n";
-    f << "format       = " << cfg.format << "\n\n";
+    f << "format       = " << cfg.format << "\n";
+    f << "block_size   = " << cfg.block_size << "\n\n";
 
     for (int i = 0; i < 4; i++) {
         f << "[Channel" << i << "]\n";
@@ -153,14 +143,6 @@ bool SaveConfig(const std::string& path, const AppConfig& cfg) {
         f << "ac           = " << (cfg.channels[i].ac ? "true" : "false") << "\n";
         f << "icp          = " << (cfg.channels[i].icp ? "true" : "false") << "\n\n";
     }
-
-    f << "[Cycle]\n";
-    f << "record_time  = " << cfg.record_time << "\n";
-    f << "sleep_time   = " << cfg.sleep_time << "\n\n";
-
-    f << "[Output]\n";
-    f << "file         = " << cfg.output_file << "\n";
-    f << "block_size   = " << cfg.block_size << "\n";
     return true;
 }
 
@@ -171,18 +153,15 @@ void PrintConfig(const AppConfig& cfg) {
     std::cout << "===== Конфигурация =====\n";
     std::cout << "CSN:        '" << cfg.csn << "'\n";
     std::cout << "Slot:       " << cfg.slot << "\n";
-    std::cout << "Freqq:       " << cfg.freq_hz << " Гц\n";
+    std::cout << "Freq:       " << cfg.freq_hz << " Гц\n";
     std::cout << "Format:     " << cfg.format << " бит\n";
+    std::cout << "BlockSize:  " << cfg.block_size << " слов\n";
     for (int i = 0; i < 4; i++) {
         const auto& c = cfg.channels[i];
-        std::cout << "CH" << i << ": enable=" << (c.enable ? "да" : "нет")
-                  << " range=±" << (c.range == LTR24_RANGE_10 ? 10 : 2) << " В"
-                  << " ac=" << (c.ac ? "да" : "нет")
-                  << " icp=" << (c.icp ? "да" : "нет") << "\n";
+        std::cout << "CH" << i << ": " << (c.enable ? "ВКЛ" : "выкл")
+                  << " ±" << (c.range == LTR24_RANGE_10 ? 10 : 2) << "В";
+        if (c.ac) std::cout << " (AC)";
+        std::cout << "\n";
     }
-    std::cout << "Record:     " << cfg.record_time << " с\n";
-    std::cout << "Sleep:      " << cfg.sleep_time << " с\n";
-    std::cout << "Output:     " << cfg.output_file << "\n";
-    std::cout << "BlockSize:  " << cfg.block_size << "\n";
     std::cout << "========================\n";
 }
